@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Сочинения ЕГЭ">
+    <meta name="theme-color" content="#0f0c29">
+    <title>Мои Сочинения ЕГЭ</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <p class="subtitle">Трекер подготовки к ЕГЭ</p>
+                <h1>Мои Сочинения</h1>
+            </div>
+            <div class="header-actions">
+                <button id="add-btn" class="icon-btn add-btn" aria-label="Добавить">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div id="stats" class="stats-container">
+            <div class="stat-card">
+                <span class="stat-value" id="total-count">0</span>
+                <span class="stat-label">Всего работ</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="avg-score">0</span>
+                <span class="stat-label">Средний балл</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="best-score">—</span>
+                <span class="stat-label">Лучший балл</span>
+            </div>
+        </div>
+
+        <main>
+            <div id="essays-list" class="essays-grid">
+                <div class="loading">Загрузка ваших работ...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Modal -->
+    <div id="add-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-overlay" id="add-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Новое сочинение</h2>
+                <button class="close-btn" id="close-modal" aria-label="Закрыть">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label for="new-topic">Тема сочинения</label>
+                <input type="text" id="new-topic" placeholder="Введите тему...">
+            </div>
+            <div class="form-group">
+                <label for="new-score">Балл (0–25)</label>
+                <input type="number" id="new-score" placeholder="Например: 18" min="0" max="25">
+            </div>
+            <div class="form-group">
+                <label for="new-content">Текст сочинения</label>
+                <textarea id="new-content" placeholder="Вставьте или напишите текст..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="save-btn" class="btn-primary">Сохранить</button>
+                <button id="cancel-add-btn" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View/Edit Modal -->
+    <div id="view-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-overlay" id="view-overlay"></div>
+        <div class="modal-content modal-view">
+            <div class="modal-header">
+                <div class="view-meta">
+                    <span id="view-score-display" class="essay-score-badge"></span>
+                </div>
+                <button class="close-btn" id="close-view-modal" aria-label="Закрыть">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <h2 id="view-topic-display"></h2>
+            <div class="form-group flex-grow">
+                <label for="view-content-edit">Текст сочинения</label>
+                <textarea id="view-content-edit" placeholder="Текст сочинения..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="update-btn" class="btn-primary">Сохранить изменения</button>
+                <button id="delete-btn" class="btn-danger">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
