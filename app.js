@@ -52,6 +52,22 @@ const api = {
         return subject;
     },
 
+    deleteSubject(id) {
+        saveData(SUBJECTS_KEY, loadData(SUBJECTS_KEY).filter(s => s.id !== id));
+        return { success: true };
+    },
+
+    deleteMock(subjectId, mockId) {
+        const subjects = loadData(SUBJECTS_KEY);
+        const idx      = subjects.findIndex(s => s.id === subjectId);
+        if (idx > -1) {
+            subjects[idx].mocks = subjects[idx].mocks.filter(m => m.id !== mockId);
+            saveData(SUBJECTS_KEY, subjects);
+            return { success: true };
+        }
+        return { error: 'not found' };
+    },
+
     addMock(subjectId, date, testScore, expandedScore) {
         const subjects = loadData(SUBJECTS_KEY);
         const idx      = subjects.findIndex(s => s.id === subjectId);
@@ -205,10 +221,30 @@ function openSubject(subj) {
                         Тестовая: ${mock.testScore} б., Развернутая: ${mock.expandedScore} б.
                     </div>
                 </div>
-                <div class="mock-score">${total} б.</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="mock-score">${total} б.</div>
+                    <button class="btn-danger" style="padding:4px 8px;font-size:0.7rem;" onclick="deleteMock('${mock.id}')">✕</button>
+                </div>
             `;
             list.appendChild(el);
         });
+    }
+
+    // Add Delete Subject button
+    if (!document.getElementById('delete-subj-btn')) {
+        const delSubjBtn = document.createElement('button');
+        delSubjBtn.id = 'delete-subj-btn';
+        delSubjBtn.className = 'btn-danger';
+        delSubjBtn.style.marginTop = '10px';
+        delSubjBtn.textContent = 'Удалить предмет';
+        delSubjBtn.onclick = () => {
+            if (confirm('Удалить предмет и все его пробники?')) {
+                api.deleteSubject(currentSubjectId);
+                closeModal('subject-modal');
+                renderSubjects();
+            }
+        };
+        list.parentNode.appendChild(delSubjBtn);
     }
 
     updateChart(mocks.map(m => ({
@@ -218,6 +254,15 @@ function openSubject(subj) {
 
     openModal('subject-modal');
 }
+
+window.deleteMock = (mockId) => {
+    if (confirm('Удалить пробник?')) {
+        api.deleteMock(currentSubjectId, mockId);
+        const subjects = api.loadSubjects();
+        const updatedSubj = subjects.find(s => s.id === currentSubjectId);
+        if (updatedSubj) openSubject(updatedSubj);
+    }
+};
 
 function updateChart(data) {
     const ctx = document.getElementById('mocks-chart').getContext('2d');
@@ -358,8 +403,18 @@ document.getElementById('save-subject-btn').addEventListener('click', () => {
 // ══════════════════════════════════════════════
 //  Event listeners — Subject detail & mocks
 // ══════════════════════════════════════════════
-document.getElementById('close-subject-modal').addEventListener('click', () => { closeModal('subject-modal'); currentSubjectId = null; });
-document.getElementById('subject-overlay').addEventListener('click',     () => { closeModal('subject-modal'); currentSubjectId = null; });
+document.getElementById('close-subject-modal').addEventListener('click', () => { 
+    closeModal('subject-modal'); 
+    currentSubjectId = null; 
+    const delSubjBtn = document.getElementById('delete-subj-btn');
+    if (delSubjBtn) delSubjBtn.remove();
+});
+document.getElementById('subject-overlay').addEventListener('click', () => { 
+    closeModal('subject-modal'); 
+    currentSubjectId = null; 
+    const delSubjBtn = document.getElementById('delete-subj-btn');
+    if (delSubjBtn) delSubjBtn.remove();
+});
 
 document.getElementById('add-mock-btn').addEventListener('click', () => {
     if (!currentSubjectId) return;
