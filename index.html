@@ -5,72 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Сочинения ЕГЭ">
-    <meta name="theme-color" content="#0f0c29">
-    <title>Мои Сочинения ЕГЭ</title>
+    <meta name="apple-mobile-web-app-title" content="ЕГЭ Трекер">
+    <meta name="theme-color" content="#0a0812">
+    <title>ЕГЭ Трекер</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
+
+        <!-- Header -->
         <header>
             <div class="header-content">
                 <p class="subtitle">Трекер подготовки к ЕГЭ</p>
-                <h1>Мои Сочинения</h1>
+                <h1 id="app-title">Мои Сочинения</h1>
             </div>
-            <div class="header-actions">
-                <button id="add-btn" class="icon-btn add-btn" aria-label="Добавить">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
-            </div>
+            <button id="add-btn" class="icon-btn add-btn" aria-label="Добавить">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
         </header>
 
-        <div id="stats" class="stats-container">
-            <div class="stat-card">
-                <span class="stat-value" id="total-count">0</span>
-                <span class="stat-label">Всего работ</span>
+        <!-- Tab Nav -->
+        <nav class="app-nav">
+            <button id="essays-tab-btn" class="nav-btn active">Сочинения</button>
+            <button id="mocks-tab-btn" class="nav-btn">Пробники</button>
+        </nav>
+
+        <!-- ══ ESSAYS SECTION ══ -->
+        <div id="essays-section">
+            <div id="stats" class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-value" id="total-count">0</span>
+                    <span class="stat-label">Всего работ</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="avg-score">—</span>
+                    <span class="stat-label">Средний балл</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="best-score">—</span>
+                    <span class="stat-label">Лучший балл</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <span class="stat-value" id="avg-score">0</span>
-                <span class="stat-label">Средний балл</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-value" id="best-score">—</span>
-                <span class="stat-label">Лучший балл</span>
+            <div id="essays-list" class="list-container">
+                <div class="loading">Загрузка сочинений...</div>
             </div>
         </div>
 
-        <main>
-            <div id="essays-list" class="essays-grid">
-                <div class="loading">Загрузка ваших работ...</div>
+        <!-- ══ MOCKS SECTION ══ -->
+        <div id="mocks-section" style="display:none;">
+            <div id="subjects-list" class="subjects-grid">
+                <div class="loading">Загрузка предметов...</div>
             </div>
-        </main>
+        </div>
+
     </div>
 
-    <!-- Add Modal -->
-    <div id="add-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
+    <!-- ══ MODAL: Add Essay ══ -->
+    <div id="add-modal" class="modal" style="display:none;">
         <div class="modal-overlay" id="add-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Новое сочинение</h2>
-                <button class="close-btn" id="close-modal" aria-label="Закрыть">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <button class="close-btn" id="close-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <div class="form-group">
-                <label for="new-topic">Тема сочинения</label>
+                <label>Тема сочинения</label>
                 <input type="text" id="new-topic" placeholder="Введите тему...">
             </div>
             <div class="form-group">
-                <label for="new-score">Балл (0–25)</label>
-                <input type="number" id="new-score" placeholder="Например: 18" min="0" max="25">
+                <label>Балл (0–22)</label>
+                <input type="number" id="new-score" placeholder="Например: 18" min="0" max="22">
             </div>
             <div class="form-group">
-                <label for="new-content">Текст сочинения</label>
+                <label>Текст сочинения</label>
                 <textarea id="new-content" placeholder="Вставьте или напишите текст..."></textarea>
             </div>
             <div class="modal-actions">
@@ -80,32 +95,96 @@
         </div>
     </div>
 
-    <!-- View/Edit Modal -->
-    <div id="view-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
+    <!-- ══ MODAL: View/Edit Essay ══ -->
+    <div id="view-modal" class="modal" style="display:none;">
         <div class="modal-overlay" id="view-overlay"></div>
         <div class="modal-content modal-view">
             <div class="modal-header">
-                <div class="view-meta">
-                    <span id="view-score-display" class="essay-score-badge"></span>
-                </div>
-                <button class="close-btn" id="close-view-modal" aria-label="Закрыть">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span id="view-score-display" class="essay-score-badge"></span>
+                <button class="close-btn" id="close-view-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <h2 id="view-topic-display"></h2>
-            <div class="form-group flex-grow">
-                <label for="view-content-edit">Текст сочинения</label>
+            <div class="form-group" style="flex:1;">
+                <label>Текст сочинения</label>
                 <textarea id="view-content-edit" placeholder="Текст сочинения..."></textarea>
             </div>
             <div class="modal-actions">
-                <button id="update-btn" class="btn-primary">Сохранить изменения</button>
+                <button id="update-btn" class="btn-primary">Сохранить</button>
                 <button id="delete-btn" class="btn-danger">Удалить</button>
             </div>
         </div>
     </div>
 
+    <!-- ══ MODAL: Add Subject ══ -->
+    <div id="add-subject-modal" class="modal" style="display:none;">
+        <div class="modal-overlay" id="add-subject-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Новый предмет</h2>
+                <button class="close-btn" id="close-add-subject-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Название предмета</label>
+                <input type="text" id="new-subject-name" placeholder="Например: Математика">
+            </div>
+            <div class="modal-actions">
+                <button id="save-subject-btn" class="btn-primary">Сохранить</button>
+                <button id="cancel-subject-btn" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Subject Detail (mocks list + chart) ══ -->
+    <div id="subject-modal" class="modal" style="display:none;">
+        <div class="modal-overlay" id="subject-overlay"></div>
+        <div class="modal-content modal-subject">
+            <div class="modal-header">
+                <h2 id="subject-title-display"></h2>
+                <button class="close-btn" id="close-subject-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="mocks-chart"></canvas>
+            </div>
+            <div id="mocks-list" class="list-container"></div>
+            <button id="add-mock-btn" class="btn-primary" style="margin-top:8px;">+ Добавить пробник</button>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Add Mock ══ -->
+    <div id="add-mock-modal" class="modal" style="display:none;">
+        <div class="modal-overlay" id="add-mock-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Новый пробник</h2>
+                <button class="close-btn" id="close-add-mock-modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Дата</label>
+                <input type="date" id="mock-date">
+            </div>
+            <div class="form-group">
+                <label>Баллы за задания</label>
+                <div id="tasks-inputs" class="tasks-inputs"></div>
+            </div>
+            <button id="add-task-input-btn" class="btn-secondary" style="font-size:0.85rem;">+ Добавить задание</button>
+            <div class="mock-total-row">Итого: <strong id="mock-total-display">0</strong> б.</div>
+            <div class="modal-actions">
+                <button id="save-mock-btn" class="btn-primary">Сохранить</button>
+                <button id="cancel-mock-btn" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
-    <div id="toast" class="toast" role="alert"></div>
+    <div id="toast" class="toast"></div>
 
     <script src="app.js"></script>
 </body>
