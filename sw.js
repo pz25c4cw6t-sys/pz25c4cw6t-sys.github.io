@@ -1,4 +1,4 @@
-const CACHE = 'ege-essays-v1';
+const CACHE = 'ege-tracker-v2';
 const ASSETS = [
   './',
   './index.html',
