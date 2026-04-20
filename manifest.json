@@ -1,6 +1,6 @@
 {
-  "name": "Мои Сочинения ЕГЭ",
-  "short_name": "Сочинения",
+  "name": "ЕГЭ Трекер",
+  "short_name": "ЕГЭ Трекер",
   "description": "Трекер сочинений для подготовки к ЕГЭ",
   "start_url": "./index.html",
   "display": "standalone",
