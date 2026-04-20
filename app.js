@@ -52,11 +52,11 @@ const api = {
         return subject;
     },
 
-    addMock(subjectId, mockData) {
+    addMock(subjectId, date, testScore, expandedScore) {
         const subjects = loadData(SUBJECTS_KEY);
         const idx      = subjects.findIndex(s => s.id === subjectId);
         if (idx > -1) {
-            const mock = { id: uid(), timestamp: new Date().toISOString(), ...mockData };
+            const mock = { id: uid(), timestamp: new Date().toISOString(), date, testScore: parseInt(testScore||0), expandedScore: parseInt(expandedScore||0) };
             subjects[idx].mocks.push(mock);
             saveData(SUBJECTS_KEY, subjects);
             return mock;
@@ -195,13 +195,15 @@ function openSubject(subj) {
         list.innerHTML = '<div class="loading" style="padding:20px;">Пробников пока нет.</div>';
     } else {
         mocks.forEach(mock => {
-            const total = mock.tasks.reduce((s,t) => s + parseInt(t.score||0), 0);
+            const total = mock.testScore + mock.expandedScore;
             const el    = document.createElement('div');
             el.className = 'mock-item';
             el.innerHTML = `
                 <div>
                     <div class="mock-date">${fmtShortDate(mock.date)}</div>
-                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">${mock.tasks.length} заданий</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">
+                        Тестовая: ${mock.testScore} б., Развернутая: ${mock.expandedScore} б.
+                    </div>
                 </div>
                 <div class="mock-score">${total} б.</div>
             `;
@@ -211,7 +213,7 @@ function openSubject(subj) {
 
     updateChart(mocks.map(m => ({
         label: fmtShortDate(m.date),
-        score: m.tasks.reduce((s,t) => s + parseInt(t.score||0), 0)
+        score: m.testScore + m.expandedScore
     })));
 
     openModal('subject-modal');
@@ -251,28 +253,6 @@ function updateChart(data) {
     });
 }
 
-// ══════════════════════════════════════════════
-//  Mock task inputs
-// ══════════════════════════════════════════════
-function addTaskInput() {
-    const container = document.getElementById('tasks-inputs');
-    const n         = container.children.length + 1;
-    const div       = document.createElement('div');
-    div.className   = 'task-input-group';
-    div.innerHTML   = `
-        <label>Задание ${n}</label>
-        <input type="number" min="0" value="0" style="flex:1;">
-    `;
-    div.querySelector('input').addEventListener('input', updateMockTotal);
-    container.appendChild(div);
-    updateMockTotal();
-}
-
-function updateMockTotal() {
-    const inputs = document.querySelectorAll('#tasks-inputs input');
-    const total  = Array.from(inputs).reduce((s,i) => s + parseInt(i.value||0), 0);
-    document.getElementById('mock-total-display').textContent = total;
-}
 
 // ══════════════════════════════════════════════
 //  Modal helpers
@@ -384,23 +364,35 @@ document.getElementById('subject-overlay').addEventListener('click',     () => {
 document.getElementById('add-mock-btn').addEventListener('click', () => {
     if (!currentSubjectId) return;
     document.getElementById('mock-date').valueAsDate = new Date();
-    document.getElementById('tasks-inputs').innerHTML = '';
-    addTaskInput();
+    document.getElementById('mock-test-score').value = 0;
+    document.getElementById('mock-expanded-score').value = 0;
+    updateMockTotal(); // Call to initialize total
     openModal('add-mock-modal');
 });
 
-document.getElementById('add-task-input-btn').addEventListener('click', addTaskInput);
+
+// Add listeners for the new score inputs
+document.getElementById('mock-test-score').addEventListener('input', updateMockTotal);
+document.getElementById('mock-expanded-score').addEventListener('input', updateMockTotal);
+
+function updateMockTotal() {
+    const testScore = parseInt(document.getElementById('mock-test-score').value || 0);
+    const expandedScore = parseInt(document.getElementById('mock-expanded-score').value || 0);
+    document.getElementById('mock-total-display').textContent = testScore + expandedScore;
+}
 
 document.getElementById('close-add-mock-modal').addEventListener('click', () => closeModal('add-mock-modal'));
 document.getElementById('cancel-mock-btn').addEventListener('click',      () => closeModal('add-mock-modal'));
 document.getElementById('add-mock-overlay').addEventListener('click',     () => closeModal('add-mock-modal'));
 
 document.getElementById('save-mock-btn').addEventListener('click', () => {
-    const date   = document.getElementById('mock-date').value;
-    const inputs = document.querySelectorAll('#tasks-inputs input');
-    if (!date || !inputs.length) { showToast('Заполните дату и задания'); return; }
-    const tasks = Array.from(inputs).map((inp, i) => ({ id: i+1, score: parseInt(inp.value||0) }));
-    api.addMock(currentSubjectId, { date, tasks });
+    const date         = document.getElementById('mock-date').value;
+    const testScore    = document.getElementById('mock-test-score').value;
+    const expandedScore = document.getElementById('mock-expanded-score').value;
+
+    if (!date) { showToast('Заполните дату'); return; }
+
+    api.addMock(currentSubjectId, date, testScore, expandedScore);
 
     // Reload subject detail
     const subjects     = api.loadSubjects();
