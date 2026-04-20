@@ -379,7 +379,15 @@ h1 {
     animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1);
     -webkit-overflow-scrolling: touch;
 }
-.modal-view, .modal-subject { max-height: 90vh; }
+.modal-view { 
+    max-height: 100vh !important; 
+    height: 100vh !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding-top: calc(var(--safe-top) + 20px);
+}
+.modal-subject { max-height: 90vh; }
 
 @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
