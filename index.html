@@ -171,10 +171,18 @@
                 <input type="date" id="mock-date">
             </div>
             <div class="form-group">
-                <label>Баллы за задания</label>
-                <div id="tasks-inputs" class="tasks-inputs"></div>
+                <label>Баллы</label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.65rem; color: var(--text-sub); margin-bottom: 4px; display: block;">Тестовая часть</label>
+                        <input type="number" id="mock-test-score" placeholder="0" min="0" value="0">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.65rem; color: var(--text-sub); margin-bottom: 4px; display: block;">Развернутая часть</label>
+                        <input type="number" id="mock-expanded-score" placeholder="0" min="0" value="0">
+                    </div>
+                </div>
             </div>
-            <button id="add-task-input-btn" class="btn-secondary" style="font-size:0.85rem;">+ Добавить задание</button>
             <div class="mock-total-row">Итого: <strong id="mock-total-display">0</strong> б.</div>
             <div class="modal-actions">
                 <button id="save-mock-btn" class="btn-primary">Сохранить</button>
